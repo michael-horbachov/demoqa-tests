@@ -1,59 +1,69 @@
 package tests;
 
-import com.codeborne.selenide.Configuration;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-
 import static com.codeborne.selenide.Condition.*;
+import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.*;
 
-public class PracticeForm {
+public class PracticeForm extends TestBase {
 
-    @BeforeAll
-    static void setup() {
-        Configuration.startMaximized = true;
-    }
+    String studentFirstName = "Jonh",
+            studentLastName = "Doe",
+            studentEmail = "jonh.doe@mail.com",
+            gender = "Male",
+            studentMobileNumber = "0123456789",
+            dayOfBirth = "1",
+            dayOfWeekOfBirth = "Saturday",
+            monthOfBirth = "January",
+            yearOfBirth = "2000",
+            subject = "Computer Science",
+            hobby = "Sports",
+            picture = "john-doe.jpeg",
+            studentAddress = "Lotus Temple Rd, Shambhu Dayal Bagh, Bahapur, New Delhi",
+            state = "NCR",
+            city = "Delhi";
 
     @Test
     void submitStudentRegistrationForm() {
-        String studentFirstName = "Jonh";
-        String studentLastName = "Doe";
-        String studentEmail = "jonh.doe@mail.com";
-        String studentMobileNumber = "0123456789";
-        String studentAddress = "Lotus Temple Rd, Shambhu Dayal Bagh, Bahapur, New Delhi";
 
         open("https://demoqa.com/automation-practice-form");
+        $(".practice-form-wrapper").shouldHave(text("Student Registration Form"));
+
         $("#firstName").setValue(studentFirstName);
         $("#lastName").setValue(studentLastName);
         $("#userEmail").setValue(studentEmail);
-        $("#gender-radio-1").parent().click();
+        $("#genterWrapper").$(byText(gender)).click();
         $("#userNumber").setValue(studentMobileNumber);
         $("#dateOfBirthInput").click();
-        $(".react-datepicker__month-select").selectOption("January");
-        $(".react-datepicker__year-select").selectOption("2000");
-        $("[aria-label='Choose Saturday, January 1st, 2000']").click();
-        $("#subjectsInput").setValue("sci").pressEnter();
-        $("#hobbies-checkbox-1").parent().click();
-        $("#uploadPicture").uploadFile(new File("src/test/resources/john-doe.jpeg"));
+        $(".react-datepicker__month-select").selectOption(monthOfBirth);
+        $(".react-datepicker__year-select").selectOption(yearOfBirth);
+        $(String.format("[aria-label='Choose %s, %s %sst, %s']",
+                        dayOfWeekOfBirth, monthOfBirth, dayOfBirth, yearOfBirth)).click();
+        $("#subjectsInput").setValue(subject).pressEnter();
+        $("#hobbiesWrapper").$(byText(hobby)).click();
+        $("#uploadPicture").uploadFromClasspath(picture);
         $("#currentAddress").setValue(studentAddress);
-        $("#react-select-3-input").setValue("ncr").pressEnter();
-        $("#react-select-4-input").setValue("del").pressEnter();
+        $("#state").click();
+        $("#stateCity-wrapper").$(byText(state)).click();
+        $("#city").click();
+        $("#stateCity-wrapper").$(byText(city)).click();
         $("#submit").click();
 
-        $(".table").shouldBe(visible);
-        $(".table tr", 1).shouldHave(text("Student Name"), text(studentFirstName), text(studentLastName));
+        $("#example-modal-sizes-title-lg").shouldHave(text("Thanks for submitting the form"));
+        $(".table tr", 1).shouldHave(text("Student Name"), text(studentFirstName + " " + studentLastName));
         $(".table tr", 2).shouldHave(text("Student Email"), text(studentEmail));
-        $(".table tr", 3).shouldHave(text("Gender"), text("Male"));
+        $(".table tr", 3).shouldHave(text("Gender"), text(gender));
         $(".table tr", 4).shouldHave(text("Mobile"), text(studentMobileNumber));
-        $(".table tr", 5).shouldHave(text("Date of Birth"), text("01 January,2000"));
-        $(".table tr", 6).shouldHave(text("Subjects"), text("Computer Science"));
-        $(".table tr", 7).shouldHave(text("Hobbies"), text("Sports"));
-        $(".table tr", 8).shouldHave(text("Picture"), text("john-doe.jpeg"));
+        $(".table tr", 5).shouldHave(text("Date of Birth"), text(dayOfBirth + " " + monthOfBirth + "," + yearOfBirth));
+        $(".table tr", 6).shouldHave(text("Subjects"), text(subject));
+        $(".table tr", 7).shouldHave(text("Hobbies"), text(hobby));
+        $(".table tr", 8).shouldHave(text("Picture"), text(picture));
         $(".table tr", 9).shouldHave(text("Address"), text(studentAddress));
-        $(".table tr", 10).shouldHave(text("State and City"), text("NCR Delhi"));
+        $(".table tr", 10).shouldHave(text("State and City"), text(state + " " + city));
+
         $("#closeLargeModal").click();
-        $(".table").shouldNotBe(visible);
+        $("#example-modal-sizes-title-lg").should(disappear);
     }
+
 }
