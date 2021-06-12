@@ -27,6 +27,8 @@ public class PracticeForm extends TestBase {
     @Test
     void submitStudentRegistrationForm() {
 
+        System.out.println("Hier was Natalie");
+
         open("https://demoqa.com/automation-practice-form");
         $(".practice-form-wrapper").shouldHave(text("Student Registration Form"));
 
